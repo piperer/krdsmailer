@@ -4,6 +4,7 @@ namespace Krdsmailer;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Silex\Provider\SwiftmailerServiceProvider;
 
 
 
@@ -35,7 +36,9 @@ class MailerServiceProvider implements ServiceProviderInterface
             
            
         );
-        
+        // need to register the swift mailer service provider
+        $app->register(new SwiftmailerServiceProvider());
+
         // RabbitMQ connection
         $rabbitmq = parse_url('amqp://jwqlzqdc:Mj9chY3Xu9zJYzt_X375o4mivpJgttZX@chicken.rmq.cloudamqp.com/jwqlzqdc');
         $app->register(new AmqpServiceProvider, [
