@@ -30,7 +30,7 @@ class AmqpServiceProvider implements ServiceProviderInterface
             )
         );
 
-        $app[self::AMQP_FACTORY] = $app->factory(function ($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $vhost = '/') use ($app) {
+        $app[self::AMQP_FACTORY] = $app->protect(function ($host = 'localhost', $port = 5672, $username = 'guest', $password = 'guest', $vhost = '/') use ($app) {
             return $this->createConnection($host, $port, $username, $password, $vhost);
         });
 
