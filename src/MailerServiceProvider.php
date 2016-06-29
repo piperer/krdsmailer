@@ -124,6 +124,11 @@ class MailerServiceProvider implements ServiceProviderInterface
         
     }
 
+    public function boot(Application $app)
+    {
+     
+    }
+
     protected function createConnection($connection){
 
         return new AMQPConnection($connection['host'], $connection['port'], $connection['username'], $connection['password'], $connection['vhost']);
