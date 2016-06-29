@@ -1,8 +1,8 @@
 <?php
 namespace Krdsmailer;
 
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
+use Silex\Application;
+use Silex\ServiceProviderInterface;
 use PhpAmqpLib\Connection\AMQPConnection;
 
 class AmqpServiceProvider implements ServiceProviderInterface
@@ -18,7 +18,7 @@ class AmqpServiceProvider implements ServiceProviderInterface
      *
      * @param Application $app An Application instance
      */
-    public function register(Container $app)
+    public function register(Application $app)
     {
         $app[self::AMQP_CONNECTIONS] = array(
             'default' => array(

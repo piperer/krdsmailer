@@ -2,8 +2,8 @@
 
 namespace Krdsmailer;
 
-use Pimple\Container;
-use Pimple\ServiceProviderInterface;
+use Silex\Application;
+use Silex\ServiceProviderInterface;
 use Silex\Provider\SwiftmailerServiceProvider;
 
 
@@ -19,7 +19,7 @@ class MailerServiceProvider implements ServiceProviderInterface
      * @param Application $app An Application instance
      */
 
-    public function register(Container $app)
+    public function register(Application $app)
     {
         // Default options.
         $app['krds.mailer.default'] = array(
