@@ -12,8 +12,8 @@
         }
     ],
     "autoload": {
-        "psr-0": {
-            "Krdsmailer": "src/"
+        "psr-4": {
+            "Krdsmailer\\": "src/"
         }
     },
     "minimum-stability": "dev"
