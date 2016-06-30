@@ -8,7 +8,20 @@ For Silex 2.x projects please krds/mailer dev-master
 
 First **register** the Mailer service provider
 
-$app->register(new Krdsmailer\MailerServiceProvider());
+$app->register(new Krdsmailer\MailerServiceProvider()
+'krds.mailer.options' => [
+		            'fromEmailAddress' => '*****',
+                    'fromEmailName' => '*****',
+                    'host' => '******',
+                    'port' => '***',
+                    'username' => '*****',
+                    'password' => '********',
+                    'encryption' => null,
+                    'auth_mode' => null,
+                    'rabbitmq'  => '****'
+		]
+	]
+);
 
 ##Sending out Emails
 

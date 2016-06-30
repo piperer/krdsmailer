@@ -5,6 +5,7 @@ namespace Krdsmailer;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 use Silex\Provider\SwiftmailerServiceProvider;
+use PhpAmqpLib\Connection\AMQPConnection;
 
 
 
@@ -25,65 +26,58 @@ class MailerServiceProvider implements ServiceProviderInterface
         $app['krds.mailer.default'] = array(
 
              // Configure the user mailer for sending password reset and email confirmation messages.
-                    'fromEmailAddress' => 'contact@krds.com',
-                    'fromEmailName' => 'TestEMail',
-                    'host' => 'smtp.sendgrid.net',
-                    'port' => '587',
-                    'username' => 'krdsphp',
-                    'password' => 'JsmHDjee9lW74xdTUQjFar5',
+                    'fromEmailAddress' => '*****',
+                    'fromEmailName' => '*****',
+                    'host' => '******',
+                    'port' => '***',
+                    'username' => '*****',
+                    'password' => '********',
                     'encryption' => null,
-                    'auth_mode' => null
+                    'auth_mode' => null,
+                    'rabbitmq'  => '****'
             
            
         );
         // need to register the swift mailer service provider
         $app->register(new SwiftmailerServiceProvider());
 
-        // RabbitMQ connection
-        $rabbitmq = parse_url('amqp://jwqlzqdc:Mj9chY3Xu9zJYzt_X375o4mivpJgttZX@chicken.rmq.cloudamqp.com/jwqlzqdc');
-        $app->register(new AmqpServiceProvider, [
-            'amqp.connections' => [
-                'default' => [
-                    'host'     => $rabbitmq['host'],
-                    'port'     => isset($rabbitmq['port']) ? $rabbitmq['port'] : 5672,
-                    'username' => $rabbitmq['user'],
-                    'password' => $rabbitmq['pass'],
-                    'vhost'    => substr($rabbitmq['path'], 1) ?: '/',
-                ],
-            ],
-        ]);
-
+       
         // Redis database -- using the heroku free redis server
         //$app->register(new Predis\Silex\ClientServiceProvider(), [
         //    'predis.parameters' => 'redis://h:p7nfolsc7o3d2m77v5gak5gvjup@ec2-46-137-72-173.eu-west-1.compute.amazonaws.com:12989',
         //]);
         
 
-        // Initialize $app['krds.mailer.options'].
-        $app['krds.mailer.init'] = $app->protect(function() use ($app) {
-            $options = $app['krds.mailer.default'];
-            if (isset($app['krds.mailer.options'])) {
-                // Merge default and configured options
-                $options = array_replace_recursive($options, $app['krds.mailer.options']);
+      
 
-               
-            }
 
-            $app['krds.mailer.options'] = $options;
-            
+         $app['amqp'] = $app->share(function($app) {
+           
+            $rabbitmqurl = $app['krds.mailer.options']['rabbitmq'];
+            // RabbitMQ connection
+            $rabbitmq = parse_url($rabbitmqurl);
+            $defaultOpts =  [
+                    'host'     => $rabbitmq['host'],
+                    'port'     => isset($rabbitmq['port']) ? $rabbitmq['port'] : 5672,
+                    'username' => $rabbitmq['user'],
+                    'password' => $rabbitmq['pass'],
+                    'vhost'    => substr($rabbitmq['path'], 1) ?: '/',
+                ];
+
+            return $this->createConnection($defaultOpts);
         });
-
         
+    
 
         
 
          // KRDS mailer initialization.
         $app['krds.mailer'] = function($app) {
 
-            $options = $app['krds.mailer.default'];
+            //$options = $app['krds.mailer.default'];
             
 
-            $app['krds.mailer.init']();
+            //$app['krds.mailer.init']();
             $app['swiftmailer.options'] = array(
                     'host' => $app['krds.mailer.options']['host'],
                     'port' => $app['krds.mailer.options']['port'],
@@ -118,6 +112,8 @@ class MailerServiceProvider implements ServiceProviderInterface
 
             return $mailer;
         };
+
+
 
         
 
