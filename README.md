@@ -27,12 +27,12 @@ $app->register(new Krdsmailer\MailerServiceProvider()
 
 Using the **Transactional** method. This sends out an email immediately without using the Email Queue
 
-$app['krds.mailer']->sendTransactionalEmail(['test@krds.fr'], 'This is a test  transactional message');
+$app['krds.mailer']->sendSingleEmail(['test@test.fr'], 'This is a test  transactional message');
 
 
 Using the **Queue** method. This sends out an email to Rabbit MQ, where workers watch the queue and send them out. 
 
-$app['krds.mailer']->sendEmailToQueue(['test@krds.fr'], 'This is a test  transactional message');
+$app['krds.mailer']->sendBatchEmail(['test@test.fr'], 'This is a test  transactional message');
 
 
 
