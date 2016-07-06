@@ -28,12 +28,16 @@ $app->register(new KRDS\mailer\MailerServiceProvider(),[
 
 Using the **Transactional** method. This sends out an email immediately without using the Email Queue
 
+```php
 $app['krds.mailer']->sendSingleEmail($toEmail, $body, $subject,  $sgHeaders = null, $attachments = null)
+```
+
 
 Using the **Queue** method. This sends out an email to Rabbit MQ, where workers watch the queue and send them out. 
 
+```php
 $app['krds.mailer']->sendBatchEmail(['toEmail' => 'test@test.fr', 'body' => 'This is a test  batch message', 'subject' => 'subject'], 'sgHeaders' => 'testheader');
-
+```
 
 
  
