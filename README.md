@@ -36,7 +36,7 @@ $app['krds.mailer']->sendSingleEmail($toEmail, $body, $subject,  $sgHeaders = nu
 Using the **Queue** method. This sends out an email to Rabbit MQ, where workers watch the queue and send them out. 
 
 ```php
-$app['krds.mailer']->sendBatchEmail(['toEmail' => 'test@test.fr', 'body' => 'This is a test  batch message', 'subject' => 'subject'], 'sgHeaders' => 'testheader');
+$app['krds.mailer']->sendBatchEmail(['toEmail' => 'test@test.fr', 'body' => 'This is a test  batch message', 'subject' => 'subject', 'sgHeaders' => 'testheader']);
 ```
 
 
