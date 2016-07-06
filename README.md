@@ -8,6 +8,7 @@ For Silex 2.x projects please krds/mailer dev-master
 
 First **register** the Mailer service provider
 
+```php
 $app->register(new Krdsmailer\MailerServiceProvider()
 'krds.mailer.options' => [
 		          'fromEmailAddress' => '*****',
@@ -22,6 +23,7 @@ $app->register(new Krdsmailer\MailerServiceProvider()
 		]
 	]
 );
+```
 
 # Sending out Emails
 
