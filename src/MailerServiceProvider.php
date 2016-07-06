@@ -1,6 +1,6 @@
 <?php
 
-namespace Krdsmailer;
+namespace KRDS\mailer;
 
 use Silex\Application;
 use Silex\ServiceProviderInterface;
@@ -23,9 +23,7 @@ class MailerServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         // Default options.
-        $app['krds.mailer.default'] = array(
-
-             // Configure the user mailer for sending password reset and email confirmation messages.
+        $default = [
                     'fromEmailAddress' => '*****',
                     'fromEmailName' => '*****',
                     'host' => '******',
@@ -37,24 +35,64 @@ class MailerServiceProvider implements ServiceProviderInterface
                     'rabbitmq'  => '****'
             
            
-        );
-        // need to register the swift mailer service provider
-        $app->register(new SwiftmailerServiceProvider());
+        ];
+        // first validate all the configuration
+
+        $this->validateConfigurations($default, $options);
+       
 
        
-        // Redis database -- using the heroku free redis server
-        //$app->register(new Predis\Silex\ClientServiceProvider(), [
-        //    'predis.parameters' => 'redis://h:p7nfolsc7o3d2m77v5gak5gvjup@ec2-46-137-72-173.eu-west-1.compute.amazonaws.com:12989',
-        //]);
-        
+        // register the AMQP service   
 
+        $this->initAmqp($app);
+
+        // need to register the swift mailer service provider
+
+        $app->register(new SwiftmailerServiceProvider());
       
+        
+        // init the KRDS mailer
+        
+        $this->initKRDSMailer($app);
+     
+
+        
+        
+    }
 
 
-         $app['amqp'] = $app->share(function($app) {
+    public function boot(Application $app)
+    {
+     
+    }
+
+    
+    protected function createConnection($connection){
+
+        return new AMQPConnection($connection['host'], $connection['port'], $connection['username'], $connection['password'], $connection['vhost']);
+    }
+
+    
+    protected function validateConfigurations($default, $options){
+
+        $missingConf = array_diff($default, $options);
+
+        if(!empty($missingConf))
+        {
+            throw new \RuntimeException('missing configuration in `krds.mailer.options`: ' . implode(', ', $missingConf));    
+        }    
+
+        
+    }
+
+    protected function initAmqp(Application $app)
+    {
+        $app['amqp'] = $app->share(function($app) {
            
             $rabbitmqurl = $app['krds.mailer.options']['rabbitmq'];
+
             // RabbitMQ connection
+            
             $rabbitmq = parse_url($rabbitmqurl);
             $defaultOpts =  [
                     'host'     => $rabbitmq['host'],
@@ -66,18 +104,16 @@ class MailerServiceProvider implements ServiceProviderInterface
 
             return $this->createConnection($defaultOpts);
         });
-        
-    
+    }
 
+    protected function initKRDSMailer(Application $app)
+    {
         
-
-         // KRDS mailer initialization.
+        
         $app['krds.mailer'] = function($app) {
 
-            //$options = $app['krds.mailer.default'];
             
-
-            //$app['krds.mailer.init']();
+            
             $app['swiftmailer.options'] = array(
                     'host' => $app['krds.mailer.options']['host'],
                     'port' => $app['krds.mailer.options']['port'],
@@ -95,6 +131,8 @@ class MailerServiceProvider implements ServiceProviderInterface
             if (!empty($missingDeps)) {
                 throw new \RuntimeException('To access the KRDS mailer you must enable the following missing dependencies: ' . implode(', ', $missingDeps));
             }
+
+            
            
             $mailer = new Mailer($app['mailer'],$app['amqp']);
             
@@ -114,20 +152,6 @@ class MailerServiceProvider implements ServiceProviderInterface
         };
 
 
-
-        
-
-        
-    }
-
-    public function boot(Application $app)
-    {
-     
-    }
-
-    protected function createConnection($connection){
-
-        return new AMQPConnection($connection['host'], $connection['port'], $connection['username'], $connection['password'], $connection['vhost']);
     }
 
 

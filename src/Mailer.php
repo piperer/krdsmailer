@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Krdsmailer;
+namespace KRDS\mailer;
 
 use \Swift_Mailer;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -15,6 +15,7 @@ class Mailer
     protected $amqp;
     
     protected $fromAddress;
+
     protected $fromName;
     
     public function __construct(\Swift_Mailer $mailer, $amqp)
@@ -28,6 +29,7 @@ class Mailer
     /**
      * @param string $fromAddress
      */
+
     public function setFromAddress($fromAddress)
     {
         $this->fromAddress = $fromAddress;
@@ -38,6 +40,7 @@ class Mailer
     /**
      * @param string $fromName
      */
+    
     public function setFromName($fromName)
     {
         $this->fromName = $fromName;
@@ -60,7 +63,7 @@ class Mailer
     
     }
     
-    public function sendTransactionalEmail($toEmail, $body, $subject = 'Transactional email',  $sgHeaders = null, $attachments = null)
+    public function sendSingleEmail($toEmail, $body, $subject = 'Transactional email',  $sgHeaders = null, $attachments = null)
     {
         if (count($toEmail) > 1) {
                 throw new \RuntimeException('A transactional Email can be sent to only one person at a time');
@@ -70,15 +73,14 @@ class Mailer
     }
 
 
-    public function sendEmailToQueue($data)
+    public function sendBatchEmail($data)
     {
         // need to validate the data and then json encode it. 
+
         $data['fromEmail'] =  $this->getFromEmail();
 
         $data   =   json_encode($data);
 
-
-       // $connection = $this->amqp;
         $channel = $this->amqp->channel();
         $channel->queue_declare('email_queue', false, true, false, false);
 
@@ -108,11 +110,13 @@ class Mailer
             $message->addPart($body, 'text/html');
 
             // if contains SMTPAPI header add it
+
             if (null !== $sgHeaders) {
                 $message->getHeaders()->addTextHeader('X-SMTPAPI', json_encode($sgHeaders));
             }
 
             // add attachments to email
+
             if ($attachments !== null and is_array($attachments)) {
                 foreach ($attachments as $attachment) {
                     $attach = Swift_Attachment::fromPath($attachment['file'], $attachment['mime'])->setFilename($attachment['filename']);
@@ -120,7 +124,7 @@ class Mailer
                 }
             }
 
-            // Send
+            
             $message->setFrom($fromEmail);
             $this->mailer->send($message);
         }

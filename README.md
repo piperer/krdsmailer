@@ -1,16 +1,16 @@
-##Versions
+# Versions
 
 To include this in your Silex 1.x project please use krds/mailer 1.*
 
 For Silex 2.x projects please krds/mailer dev-master
 
-##Register Provider
+# Register Provider
 
 First **register** the Mailer service provider
 
 $app->register(new Krdsmailer\MailerServiceProvider()
 'krds.mailer.options' => [
-		            'fromEmailAddress' => '*****',
+		          'fromEmailAddress' => '*****',
                     'fromEmailName' => '*****',
                     'host' => '******',
                     'port' => '***',
@@ -23,7 +23,7 @@ $app->register(new Krdsmailer\MailerServiceProvider()
 	]
 );
 
-##Sending out Emails
+# Sending out Emails
 
 Using the **Transactional** method. This sends out an email immediately without using the Email Queue
 
