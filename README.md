@@ -1,40 +1,38 @@
-# Versions
+# Installation
 
-To include this in your Silex 1.x project please use krds/mailer 1.*
-
-For Silex 2.x projects please krds/mailer dev-master
+```php
+     composer require krds/mailer
+```
 
 # Register Provider
 
-First **register** the Mailer service provider
+Then you will need to  **register** the KRDS Mailer service provider
 
 ```php
-$app->register(new Krdsmailer\MailerServiceProvider()
-'krds.mailer.options' => [
-		          'fromEmailAddress' => '*****',
-                    'fromEmailName' => '*****',
-                    'host' => '******',
-                    'port' => '***',
-                    'username' => '*****',
-                    'password' => '********',
+$app->register(new KRDS\mailer\MailerServiceProvider(),[
+     'krds.mailer.options' => [
+                    'fromEmailAddress' => '**',
+                    'fromEmailName' => '**',
+                    'host' => '**',
+                    'port' => '587',
+                    'username' => '**',
+                    'password' => '**',
                     'encryption' => null,
                     'auth_mode' => null,
-                    'rabbitmq'  => '****'
-		]
-	]
-);
+                    'rabbitmq'  => '**'
+          ]
+     ]);
 ```
 
 # Sending out Emails
 
 Using the **Transactional** method. This sends out an email immediately without using the Email Queue
 
-$app['krds.mailer']->sendSingleEmail(['test@test.fr'], 'This is a test  transactional message');
-
+$app['krds.mailer']->sendSingleEmail($toEmail, $body, $subject,  $sgHeaders = null, $attachments = null)
 
 Using the **Queue** method. This sends out an email to Rabbit MQ, where workers watch the queue and send them out. 
 
-$app['krds.mailer']->sendBatchEmail(['test@test.fr'], 'This is a test  transactional message');
+$app['krds.mailer']->sendBatchEmail(['toEmail' => 'test@test.fr', 'body' => 'This is a test  batch message', 'subject' => 'subject'], 'sgHeaders' => 'testheader');
 
 
 

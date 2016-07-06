@@ -65,7 +65,7 @@ class Mailer
     
     public function sendSingleEmail($toEmail, $body, $subject = 'Transactional email',  $sgHeaders = null, $attachments = null)
     {
-        if (count($toEmail) > 1) {
+        if (isArray($toEmail) && count($toEmail) > 1) {
                 throw new \RuntimeException('A transactional Email can be sent to only one person at a time');
             }
         
